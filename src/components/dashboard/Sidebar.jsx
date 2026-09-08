@@ -3,7 +3,7 @@ import Logo from "../common/Logo";
 import SidebarItem from "./SidebarItem";
 
 import sidebarItems from "../../constants/sidebarItems";
-import LogoutButton from "../../features/settings/components/LogoutButton";
+import LogoutButton from "../../features/settings/Components/LogoutButton";
 
 
 

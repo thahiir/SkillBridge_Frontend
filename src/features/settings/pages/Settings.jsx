@@ -1,11 +1,11 @@
 import PageHeader from "../../../components/dashboard/PageHeader";
 
-import ThemeToggle from "../components/ThemeToggle";
-import AccountSettings from "../components/AccountSettings";
-import SecuritySettings from "../components/SecuritySettings";
-import NotificationSettings from "../components/NotificationSettings";
-import DangerZone from "../components/DangerZone";
-import LogoutButton from "../components/LogoutButton";
+import ThemeToggle from "../Components/ThemeToggle";
+import AccountSettings from "../Components/AccountSettings";
+import SecuritySettings from "../Components/SecuritySettings";
+import NotificationSettings from "../Components/NotificationSettings";
+import DangerZone from "../Components/DangerZone";
+import LogoutButton from "../Components/LogoutButton";
 
 const Settings = () => {
     return (
