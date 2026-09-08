@@ -1,6 +1,6 @@
 import { User, Mail, Phone, Calendar } from "lucide-react";
 
-const ProfileCards = ({ profile, onEdit }) => {
+const ProfileCard = ({ profile, onEdit }) => {
 
     if (!profile) return null;
 
@@ -118,4 +118,4 @@ const ProfileCards = ({ profile, onEdit }) => {
 
 };
 
-export default ProfileCards;
+export default ProfileCard;
