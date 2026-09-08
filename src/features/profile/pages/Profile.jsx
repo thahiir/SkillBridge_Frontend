@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import PageHeader from "../../../components/dashboard/PageHeader";
 
-import ProfileCard from "../components/ProfileCards";
+import ProfileCard from "../components/ProfileCard";
 import ProfileForm from "../components/ProfileForm";
 import AvatarUpload from "../components/AvatarUpload";
 import ProfileStats from "../components/ProfileStats";
