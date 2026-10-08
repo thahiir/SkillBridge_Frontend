@@ -22,7 +22,7 @@ export const registerUser = async (userData) => {
 export const loginUser = async (credentials) => {
 
     const { data } = await api.post(
-        "/user/login",
+        "api/user/login",
         credentials
     );
 

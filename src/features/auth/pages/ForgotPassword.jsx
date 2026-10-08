@@ -1,237 +1,350 @@
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+import { motion } from "framer-motion";
+import { Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
 
 import toast from "react-hot-toast";
 
 import AuthCard from "../components/AuthCard";
 import AuthInput from "../components/AuthInput";
-import AuthDivider from "../components/AuthDivider";
 
 import { forgotPassword } from "../api/authApi";
 import { forgotPasswordSchema } from "../schemas/forgotPasswordSchema";
 
-import { useEffect, useRef, useState } from "react";
-
 const ForgotPassword = () => {
 
+    const [emailSent, setEmailSent] = useState(false);
+
+    const [email, setEmail] = useState("");
+
+    const [countdown, setCountdown] = useState(60);
+
+    const [isResending, setIsResending] = useState(false);
+
     const {
-
         register,
-
         handleSubmit,
-
-        formState: { errors, isSubmitting },
-
+        setFocus,
+        formState: {
+            errors,
+            isSubmitting,
+        },
     } = useForm({
-
         resolver: zodResolver(forgotPasswordSchema),
-
+        defaultValues: {
+            Email: "",
+        },
     });
 
+    // Focus email input
     useEffect(() => {
 
-            if (!emailSent) {
+        if (!emailSent) {
+            setFocus("Email");
+        }
 
-                emailInputRef.current?.focus();
+    }, [emailSent, setFocus]);
 
-            }
 
-        }, [emailSent]);
+    // Resend countdown
+    useEffect(() => {
 
+        if (!emailSent || countdown <= 0) {
+            return;
+        }
+
+        const timer = setTimeout(() => {
+
+            setCountdown((prev) => prev - 1);
+
+        }, 1000);
+
+        return () => clearTimeout(timer);
+
+    }, [emailSent, countdown]);
+
+
+    // Submit reset request
     const onSubmit = async (data) => {
 
         try {
 
-            await forgotPassword(data.email);
+            await forgotPassword(data.Email);
+
+            setEmail(data.Email);
+
+            setEmailSent(true);
+
+            setCountdown(60);
 
             toast.success("Password reset link sent");
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             toast.error(
-
                 error.response?.data?.message ||
-
                 "Unable to send reset email"
-
             );
 
         }
 
     };
 
+
+    // Resend reset link
+    const handleResend = async () => {
+
+        if (countdown > 0 || isResending) {
+            return;
+        }
+
+        try {
+
+            setIsResending(true);
+
+            await forgotPassword(email);
+
+            setCountdown(60);
+
+            toast.success("Reset link sent again");
+
+        } catch (error) {
+
+            toast.error(
+                error.response?.data?.message ||
+                "Unable to resend reset link"
+            );
+
+        } finally {
+
+            setIsResending(false);
+
+        }
+
+    };
+
+
     return (
 
-        <>
+        <AuthCard
 
-            {
+            title={
+                emailSent
+                    ? "Check Your Email 📩"
+                    : "Forgot Password?"
+            }
 
-                emailSent ? (
+            subtitle={
+                emailSent
+                    ? "We've sent a password reset link to your email."
+                    : "Enter your email address and we'll send you a password reset link."
+            }
 
-                    <SuccessCard
+        >
 
-                        email={email}
+            {emailSent ? (
 
-                        countdown={countdown}
+                <motion.div
 
-                        onResend={handleResend}
+                    initial={{
+                        opacity: 0,
+                        y: 20,
+                    }}
 
-                        isResending={isResending}
+                    animate={{
+                        opacity: 1,
+                        y: 0,
+                    }}
 
-                    />
+                    transition={{
+                        duration: 0.5,
+                    }}
 
-                ) : (
+                    className="space-y-6 text-center"
 
-                    <AuthCard
+                >
 
-                        title="Forgot Password?"
+                    <div className="flex justify-center">
 
-                        subtitle="Enter your email address and we'll send you a password reset link."
+                        <CheckCircle2
+                            size={64}
+                            className="text-green-500"
+                        />
+
+                    </div>
+
+                    <p className="text-sm text-slate-600">
+
+                        We've sent a password reset link to
+
+                        <br />
+
+                        <span className="font-semibold text-slate-800">
+
+                            {email}
+
+                        </span>
+
+                    </p>
+
+                    <p className="text-sm text-slate-500">
+
+                        Didn't receive the email?
+
+                    </p>
+
+                    <button
+
+                        type="button"
+
+                        onClick={handleResend}
+
+                        disabled={
+                            countdown > 0 ||
+                            isResending
+                        }
+
+                        className="font-medium text-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
 
                     >
 
-                        <motion.form
+                        {isResending
 
-                            initial={{
+                            ? "Resending..."
 
-                                opacity: 0,
+                            : countdown > 0
 
-                                y: 20,
+                                ? `Resend in ${countdown}s`
 
-                            }}
+                                : "Resend Reset Link"
 
-                            animate={{
+                        }
 
-                                opacity: 1,
+                    </button>
 
-                                y: 0,
+                    <Link
 
-                            }}
+                        to="/login"
 
-                            transition={{
+                        className="flex items-center justify-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-800"
 
-                                duration: .5,
+                    >
 
-                            }}
+                        <ArrowLeft size={18} />
 
-                            onSubmit={handleSubmit(onSubmit)}
+                        Back to Login
 
-                            className="space-y-6"
+                    </Link>
 
-                        >
+                </motion.div>
 
-                            {/* Email */}
-<AuthInput
+            ) : (
 
-    ref={emailInputRef}
+                <motion.form
 
-    label="Email Address"
+                    initial={{
+                        opacity: 0,
+                        y: 20,
+                    }}
 
-    type="email"
+                    animate={{
+                        opacity: 1,
+                        y: 0,
+                    }}
 
-    placeholder="Enter your email"
+                    transition={{
+                        duration: 0.5,
+                    }}
 
-    autoComplete="email"
+                    onSubmit={handleSubmit(onSubmit)}
 
-    aria-label="Email Address"
+                    className="space-y-6"
 
-    icon={<Mail size={18} />}
+                >
 
-    {...register("Email")}
+                    <AuthInput
 
-    error={errors.Email?.message}
+                        label="Email Address"
 
-/>
+                        type="email"
 
-                            {/* Button */}
+                        placeholder="Enter your email"
 
-                            <motion.button
+                        autoComplete="email"
 
-    whileHover={{
+                        icon={<Mail size={18} />}
 
-        scale: 1.02,
+                        {...register("Email")}
 
-    }}
+                        error={errors.Email?.message}
 
-    whileTap={{
+                    />
 
-        scale: .98,
+                    <motion.button
 
-    }}
+                        whileHover={{
+                            scale: 1.02,
+                        }}
 
-    disabled={isSubmitting}
+                        whileTap={{
+                            scale: 0.98,
+                        }}
 
-    type="submit"
+                        disabled={isSubmitting}
 
-    aria-label="Send Password Reset Link"
+                        type="submit"
 
-    className="w-full rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-2xl disabled:cursor-not-allowed disabled:opacity-70"
+                        className="w-full rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-2xl disabled:cursor-not-allowed disabled:opacity-70"
 
->
+                    >
 
-    {
+                        {isSubmitting
 
-        isSubmitting
+                            ? "Sending Reset Link..."
 
-            ?
+                            : "Send Reset Link"
 
-            "Sending Reset Link..."
+                        }
 
-            :
+                    </motion.button>
 
-            "Send Reset Link"
+                    <div className="flex items-center">
 
-    }
+                        <div className="flex-1 border-t border-slate-200" />
 
-</motion.button>
+                        <span className="px-3 text-sm text-slate-400">
 
-                            {/* Divider */}
+                            OR
 
-                            <div className="flex items-center">
+                        </span>
 
-                                <div className="flex-1 border-t border-slate-200" />
+                        <div className="flex-1 border-t border-slate-200" />
 
-                                <span className="px-3 text-sm text-slate-400">
+                    </div>
 
-                                    OR
+                    <Link
 
-                                </span>
+                        to="/login"
 
-                                <div className="flex-1 border-t border-slate-200" />
+                        className="flex items-center justify-center gap-2 text-sm font-medium text-indigo-600 transition hover:text-indigo-800"
 
-                            </div>
+                    >
 
-                            {/* Back */}
+                        <ArrowLeft size={18} />
 
-                            <Link
+                        Back to Login
 
-                                to="/login"
+                    </Link>
 
-                                className="flex items-center justify-center gap-2 text-sm font-medium text-indigo-600 transition hover:text-indigo-800"
+                </motion.form>
 
-                            >
+            )}
 
-                                <ArrowLeft
-
-                                    size={18}
-
-                                />
-
-                                Back to Login
-
-                            </Link>
-
-                        </motion.form>
-
-                    </AuthCard>
-
-                )
-
-            }
-
-        </>
+        </AuthCard>
 
     );
 
