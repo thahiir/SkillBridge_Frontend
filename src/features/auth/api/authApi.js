@@ -61,7 +61,7 @@ export const resetPassword = async (
         `/api/user/reset-password/${token}`,
 
         {
-            Password: password,
+            password: password,
         }
 
     );
