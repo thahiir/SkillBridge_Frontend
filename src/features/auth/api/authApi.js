@@ -7,7 +7,7 @@ import api from "../../../api/axios";
 export const registerUser = async (userData) => {
 
     const { data } = await api.post(
-        "/api/user/register",
+        "/user/register",
         userData
     );
 
@@ -22,7 +22,7 @@ export const registerUser = async (userData) => {
 export const loginUser = async (credentials) => {
 
     const { data } = await api.post(
-        "/api/user/login",
+        "/user/login",
         credentials
     );
 
@@ -37,7 +37,7 @@ export const loginUser = async (credentials) => {
 export const forgotPassword = async (email) => {
 
     const { data } = await api.post(
-        "/api/user/forgot-password",
+        "/user/forgot-password",
         {
             Email: email,
         }
@@ -57,13 +57,10 @@ export const resetPassword = async (
 ) => {
 
     const { data } = await api.post(
-
-        `/api/user/reset-password/${token}`,
-
+        `/user/reset-password/${token}`,
         {
             password: password,
         }
-
     );
 
     return data;
@@ -77,7 +74,7 @@ export const resetPassword = async (
 export const getCurrentUser = async () => {
 
     const { data } = await api.get(
-        "/api/user/me"
+        "/user/me"
     );
 
     return data;
